@@ -1,59 +1,57 @@
-import "../basehub.config";
-import type { Viewport } from "next";
-import { Geist } from "next/font/google";
-import { Providers } from "@/context";
-import { Header } from "@/components/header";
-import { Toolbar } from "basehub/next-toolbar";
-import { basehub } from "basehub";
-import { MeshGradientComponent } from "@/components/mesh-gradient";
-import { PlaygroundSetupModal } from "@/components/playground-notification";
-import "./globals.css";
+import type React from "react"
+import "../basehub.config"
+import type { Viewport } from "next"
+import { Geist } from "next/font/google"
+import { Providers } from "@/context"
+import { Header } from "@/components/header"
+import { Toolbar } from "basehub/next-toolbar"
+import { basehub } from "basehub"
+import { MeshGradientComponent } from "@/components/mesh-gradient"
+import { PlaygroundSetupModal } from "@/components/playground-notification"
+import "./globals.css"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
   preload: true,
-});
+})
 
-export const dynamic = "force-static";
-export const revalidate = 30;
+export const dynamic = "force-static"
+export const revalidate = 30
 
-const envs: Record<string, { isValid: boolean; name: string; label: string }> =
-  {};
-const _vercel_url_env_name = "VERCEL_URL";
-const isMainV0 = process.env[_vercel_url_env_name]?.startsWith(
-  "kzmksltmu7fad4zoa2wi"
-);
+const envs: Record<string, { isValid: boolean; name: string; label: string }> = {}
+const _vercel_url_env_name = "VERCEL_URL"
+const isMainV0 = process.env[_vercel_url_env_name]?.startsWith("kzmksltmu7fad4zoa2wi")
 
-let allValid = true;
+let allValid = true
 const subscribeEnv = ({
   name,
   label,
   value,
 }: {
-  name: string;
-  label: string;
-  value: string | undefined;
+  name: string
+  label: string
+  value: string | undefined
 }) => {
-  const isValid = !!value;
+  const isValid = !!value
   if (!isValid) {
-    allValid = false;
+    allValid = false
   }
   envs[name] = {
     isValid,
     name,
     label,
-  };
-};
+  }
+}
 
 export const viewport: Viewport = {
   maximumScale: 1, // Disable auto-zoom on mobile Safari
-};
+}
 
 export default async function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: React.ReactNode
 }>) {
   const { settings } = await basehub().query({
     settings: {
@@ -67,20 +65,20 @@ export default async function RootLayout({
         speed: true,
       },
     },
-  });
+  })
 
-  let playgroundNotification = null;
+  let playgroundNotification = null
 
   subscribeEnv({
     name: "BASEHUB_TOKEN",
     label: "BaseHub Read Token",
     value: process.env.BASEHUB_TOKEN,
-  });
+  })
   subscribeEnv({
     name: "RESEND_API_KEY",
     label: "Resend API Key",
     value: process.env.RESEND_API_KEY,
-  });
+  })
 
   if (!isMainV0 && !allValid && process.env.NODE_ENV !== "production") {
     const playgroundData = await basehub().query({
@@ -91,27 +89,26 @@ export default async function RootLayout({
           claimUrl: true,
         },
       },
-    });
+    })
 
     if (playgroundData._sys.playgroundInfo) {
-      playgroundNotification = (
-        <PlaygroundSetupModal
-          playgroundInfo={playgroundData._sys.playgroundInfo}
-          envs={envs}
-        />
-      );
+      playgroundNotification = <PlaygroundSetupModal playgroundInfo={playgroundData._sys.playgroundInfo} envs={envs} />
     }
   }
 
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="zh-CN" suppressHydrationWarning>
+      <head>
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+      </head>
       <body
         className={`${geistSans.className} antialiased max-w-screen min-h-svh bg-slate-1 text-slate-12 opacity-0 duration-75 transition-opacity`}
+        style={{ opacity: 1 }}
       >
-        <Providers
-          defaultTheme={settings.defaultTheme || "system"}
-          forcedTheme={settings.forcedTheme}
-        >
+        <Providers defaultTheme={settings.defaultTheme || "system"} forcedTheme={settings.forcedTheme}>
           <MeshGradientComponent
             colors={[
               settings.background.color1.hex,
@@ -140,9 +137,11 @@ export default async function RootLayout({
         {playgroundNotification}
       </body>
     </html>
-  );
+  )
 }
 
 export const metadata = {
-      generator: 'v0.dev'
-    };
+  generator: "v0.dev",
+  title: "等候名单 - 加入我们",
+  description: "加入我们的等候名单，第一时间获得最新消息",
+}

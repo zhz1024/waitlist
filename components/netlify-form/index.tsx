@@ -86,8 +86,10 @@ export function NetlifyForm() {
   const formRef = useRef<HTMLFormElement>(null)
   const successRef = useRef<HTMLDivElement>(null)
 
+  // 移除自动恢复逻辑，保持在成功页面
   useEffect(() => {
     if (state === "success" && successRef.current) {
+      // 成功页面动画
       gsap.fromTo(
         successRef.current,
         {
@@ -134,31 +136,27 @@ export function NetlifyForm() {
     try {
       setState("loading")
 
-      // 构建表单数据
-      const submitData = new URLSearchParams()
-      submitData.append("form-name", "waitlist")
+      // 构建 Netlify 表单数据
+      const netlifyFormData = new FormData()
+      netlifyFormData.append("form-name", "waitlist")
 
       Object.entries(formData).forEach(([key, value]) => {
         if (Array.isArray(value)) {
-          submitData.append(key, value.join(", "))
+          netlifyFormData.append(key, value.join(", "))
         } else {
-          submitData.append(key, value || "")
+          netlifyFormData.append(key, value || "")
         }
       })
 
-      // 提交到 Netlify 函数
-      const response = await fetch("/.netlify/functions/submit-form", {
+      const response = await fetch("/", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: submitData.toString(),
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams(netlifyFormData as any).toString(),
       })
 
-      const result = await response.json()
-
-      if (response.ok && result.success) {
+      if (response.ok) {
         setState("success")
+        // 表单提交成功动画
         if (formRef.current) {
           gsap.to(formRef.current, {
             opacity: 0,
@@ -168,7 +166,7 @@ export function NetlifyForm() {
           })
         }
       } else {
-        throw new Error(result.error || "提交失败")
+        throw new Error("提交失败")
       }
     } catch (error) {
       setState("error")
@@ -216,7 +214,14 @@ export function NetlifyForm() {
   }
 
   return (
-    <form ref={formRef} name="waitlist" method="POST" onSubmit={handleSubmit} className="space-y-6 w-full">
+    <form
+      ref={formRef}
+      name="waitlist"
+      method="POST"
+      data-netlify="true"
+      onSubmit={handleSubmit}
+      className="space-y-6 w-full"
+    >
       <input type="hidden" name="form-name" value="waitlist" />
 
       {questions.map((question, index) => (

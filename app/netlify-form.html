@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Netlify Form</title>
+</head>
+<body>
+  <!-- 隐藏的 Netlify 表单，用于表单检测 -->
+  <form name="waitlist" netlify netlify-honeypot="bot-field" hidden>
+    <input type="text" name="email" />
+    <input type="text" name="name" />
+    <input type="text" name="company" />
+    <select name="role">
+      <option value="developer">开发者</option>
+      <option value="designer">设计师</option>
+      <option value="product-manager">产品经理</option>
+      <option value="founder">创始人/CEO</option>
+      <option value="marketing">市场营销</option>
+      <option value="other">其他</option>
+    </select>
+    <input type="checkbox" name="interests[]" value="ai-tools" />
+    <input type="checkbox" name="interests[]" value="automation" />
+    <input type="checkbox" name="interests[]" value="analytics" />
+    <input type="checkbox" name="interests[]" value="collaboration" />
+    <input type="checkbox" name="interests[]" value="integration" />
+    <input type="radio" name="usage" value="personal" />
+    <input type="radio" name="usage" value="team" />
+    <input type="radio" name="usage" value="enterprise" />
+    <textarea name="feedback"></textarea>
+  </form>
+</body>
+</html>
